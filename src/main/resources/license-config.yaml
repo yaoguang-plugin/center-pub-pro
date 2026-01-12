@@ -1,0 +1,33 @@
+# 中央仓库发布许可证配置文件
+
+# 说明：
+# 一、唯一标识 id
+# 1. id：许可证唯一标识
+# 2. title：许可证的展示名称，用于直观识别
+# 3. serialNumber：许可证序号
+
+# 二、基本信息 baseInfo
+# 1. enabled：布尔值（true/false），表示该许可证是否启用。true为启用，false为禁用。
+# 2. required：布尔值，说明该许可证是否为必须项。true表示项目必须遵循，false表示可选。
+# 3. description：对该许可证配置的说明，解释其作用（如生成LICENSE.txt文件并满足中央仓库规范）。
+
+# 三、许可证信息 licenseInfo
+# 1. name：许可证的完整官方名称，用于精确标识
+# 2. url：指向许可证原文的官方链接，用户可通过该链接查看完整条款，保证合规性和透明性。
+# 3. distribution：许可证文件的分发方式，repo表示该许可证文件会随代码仓库（如 Maven 中央仓库）一起分发。
+
+licenses:
+  # 可选：许可证插件（中央仓库要求提供许可证文件）
+  - id: Apache-2.0
+    title: 阿帕奇 2.0
+    serialNumber: 1
+    licenseType: Apache-2.0 # 新增字段
+    baseInfo:
+      order: 1
+      enabled: true
+      required: false
+      description: 生成许可证文件（如LICENSE.txt），满足中央仓库规范
+    licenseInfo:
+      name: The Apache Software License, Version2.0
+      url: https://www.apache.org/licenses/LICENSE-2.0.txt
+      distribution: repo

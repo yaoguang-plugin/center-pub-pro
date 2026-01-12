@@ -1,0 +1,129 @@
+# 中央仓库发布插件配置文件
+
+# 说明：
+
+# 一、插件标识 id
+# 1. id：插件唯一标识
+# 2. title：插件名称
+# 3. serialNumber：插件序号
+
+# 二、基础信息 baseInfo
+# 1. order：执行顺序（数字越小越先执行），优先级低于依赖关系
+# 2. enabled：是否默认启用（false则跳过配置）
+# 3. required：是否必需插件（true则禁用会报错）
+# 4. description：插件描述
+# 5. dependencies：依赖的插件 ID（被依赖插件会优先执行）
+
+# 三、插件信息 pluginInfo
+# 1. groupId 组 ID（组织 / 团体的唯一标识：用于区分不同的组织、公司或项目团体。）
+# 2. artifactId 插件 ID（项目 / 模块的唯一标识：在同一个 groupId 下，artifactId 用于区分不同的项目或模块。）
+# 3. version：插件版本号（默认从 pom 文件中读取，和 pom 的版本保持一致）/ 支持环境变量替换（如${MAVEN_GPG_PLUGIN_VERSION}）
+# 4. expandTags：扩展标签
+# 5. configuration：配置项
+# 6. executions：执行配置
+
+plugins:
+  # 源码打包插件（中央仓库要求提供源码包） MAVEN_SOURCE_PLUGIN_VERSION
+  - id: source
+    title: source 源码插件
+    serialNumber: 1
+    baseInfo:
+      order: 1
+      enabled: true
+      required: true
+      description: 打包项目源码为-source.jar，满足中央仓库发布规范
+      # 依赖 gpg 插件，确保签名前先打好源码包
+      dependencies: [ gpg ]
+    pluginInfo:
+      groupId: org.apache.maven.plugins
+      artifactId: maven-source-plugin
+      version: ${${maven-source-plugin.version}:3.3.1}
+      expandTags:
+      configuration:
+      executions:
+
+  # Javadoc 打包插件（中央仓库要求提供文档包） MAVEN_JAVADOC_PLUGIN_VERSION
+  - id: javadoc
+    title: javadoc 文档插件
+    serialNumber: 2
+    baseInfo:
+      order: 2
+      enabled: true
+      required: true
+      description: 生成 Javadoc 文档并打包为-javadoc.jar，满足中央仓库发布规范
+      # 依赖 gpg 插件，确保签名前先打好文档包
+      dependencies: [ gpg ]
+    pluginInfo:
+      groupId: org.apache.maven.plugins
+      artifactId: maven-javadoc-plugin
+      version: ${${maven-javadoc-plugin.version}:3.12.0}
+      expandTags:
+      configuration:
+      executions:
+        - id: attach-javadocs
+          phase:
+          goals: [ "jar" ]
+          configuration:
+
+  # GPG 签名插件（必需，中央仓库要求发布包必须签名） ${MAVEN_GPG_PLUGIN_VERSION:3.2.8}
+  - id: gpg
+    title: gpg 签名插件
+    serialNumber: 3
+    baseInfo:
+      order: 3
+      enabled: true
+      required: true
+      description: 对发布的 Jar 包进行 GPG 签名，中央仓库发布必需
+      dependencies: []
+    pluginInfo:
+      groupId: org.apache.maven.plugins
+      artifactId: maven-gpg-plugin
+      version: ${${maven-gpg-plugin.version}:3.2.8}
+      expandTags:
+      configuration:
+      executions:
+        - id: default-cli
+          phase: verify
+          goals: ["jar"]
+          configuration: { "keyname": "n","passphrase": "n" }
+
+  # 部署插件（将包部署到 Staging 仓库）
+  - id: deploy
+    title: deploy 部署插件
+    serialNumber: 4
+    baseInfo:
+      order: 4
+      enabled: true
+      required: true
+      description: 将打包好的 Jar、源码、文档包部署到指定仓库
+      dependencies: [centralPublish]
+    pluginInfo:
+      groupId: org.apache.maven.plugins
+      artifactId: maven-deploy-plugin
+      version: ${MAVEN_DEPLOY_PLUGIN_VERSION:3.0.0}
+      expandTags:
+      configuration: {"skip": true}
+      executions:
+
+  # 中央仓库发布插件（处理 Nexus staging 仓库） NEXUS_STAGING_PLUGIN_VERSION
+  - id: central
+    title: 中央仓库发布插件
+    serialNumber: 5
+    baseInfo:
+      order: 5
+      enabled: true
+      required: true
+      # 依赖源码、文档插件，确保先打好所有包
+      dependencies: [ source, javadoc ]
+      description: 管理中央仓库 Staging 仓库（关闭、发布、丢弃等操作）
+    pluginInfo:
+      groupId: org.sonatype.central
+      artifactId: central-publishing-maven-plugin
+      version: ${${central-publishing-maven-plugin.version}:0.9.0}
+      expandTags:
+      configuration: {
+        "publishingServerId":${publishing-server-id},
+        "autoPublish":${auto-releases-enabled},
+        "waitUntil":${wait-until}
+      }
+      executions:

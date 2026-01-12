@@ -1,0 +1,57 @@
+# 中央仓库发布依赖配置文件
+
+# 说明：
+# 一、唯一标识 id
+# 1. id：依赖唯一标识
+# 2. title：依赖的展示名称，用于直观识别
+# 3. serialNumber：许可证序号
+
+# 二、基础信息 baseInfo
+# 1. order：执行顺序（数字越小越先执行）
+# 2. enabled：是否默认启用（false则跳过配置）
+# 3. required：是否必需依赖（true则禁用会报错）
+# 4. description：插件描述
+# 5. dependencies：依赖的依赖 ID（被依赖插件会优先执行）
+
+# 三、依赖信息 dependencyInfo
+# 1. groupId 组 ID（组织 / 团体的唯一标识：用于区分不同的组织、公司或项目团体。）
+# 2. artifactId 依赖 ID（项目 / 模块的唯一标识：在同一个 groupId 下，artifactId 用于区分不同的项目或模块。）
+# 3. version：依赖版本号（默认从 pom 文件中读取，和 pom 的版本保持一致）/ 支持环境变量替换（如${MAVEN_GPG_PLUGIN_VERSION}）
+# 4. 依赖的类型，默认是 jar，可指定 war、ear、pom 等（若引入一个用于依赖管理的 pom，可设为 <type>pom</type>）
+# 5. scope：定义依赖的作用域（即依赖在哪些阶段生效），默认值为 compile。
+#   示例说明：
+#       - compile：编译、测试、运行都生效（默认）
+#       - test：仅测试阶段生效（如 junit）
+#       - runtime：编译不生效，运行 / 测试生效（如 JDBC 驱动）
+#       - provided：编译 / 测试生效，运行时由容器提供（如 servlet-api）
+#       - system：类似 provided，但依赖本地 jar（不推荐）
+#       - import：仅在 dependencyManagement 中使用，用于导入其他 pom 的依赖管理配置
+# 6. optional：标记依赖为可选依赖，设为 true 时，该依赖不会被传递（其他项目引入当前项目时，不会自动引入此依赖）。
+# 7. classifier：分类器，用于区分同一 artifact 的不同构建产物（如源码包、文档包、不同 JDK 版本的包）。
+# 8. exclusions： 排除传递依赖中的某个子依赖（解决依赖冲突的关键手段）
+# 9. systemPath： 仅当 scope=system 时使用，指定本地 jar 包的路径（不推荐，易导致移植性问题）。
+#    示例说明：<systemPath>${project.basedir}/lib/mylib.jar</systemPath>
+# 10. versionRange: （高级特性）指定版本范围，而非固定版本（如 [5.0,6.0) 表示 5.x 版本）。
+#     示例：<version>[5.3.0,6.0.0)</version>
+
+dependency:
+  - id: plexus
+    title: plexus
+    serialNumber: 1
+    baseInfo:
+      order: 15
+      enabled: true
+      required: false
+      description: 发布必用工具依赖
+      dependencies: []
+    dependencyInfo:
+      groupId: org.codehaus.plexus
+      artifactId: plexus-utils
+      version: ${LICENSE_PLUGIN_VERSION:3.4.2}
+      type:
+      scope:
+      optional:
+      classifier:
+      exclusions:
+      systemPath:
+      versionRange:

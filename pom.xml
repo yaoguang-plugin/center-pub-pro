@@ -1,0 +1,673 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <!-- 项目信息 -->
+
+    <!-- 组 id：必须和你申请时的一致 -->
+    <groupId>com.gitee.xudai</groupId>
+    <!--工件 id：每个项目的 id 唯一 smart nexus deployer-->
+    <artifactId>central-publisher-maven-plugin</artifactId>
+    <packaging>maven-plugin</packaging>
+
+    <!--
+        版本:
+        1.稳定版：RELEASE
+        2.快照版：SNAPSHOT
+    -->
+    <version>${revision}</version>
+    <!--项目名称-->
+    <name>Maven Central Publish Plugin</name>
+    <!--描述-->
+    <description>Maven plugin for simplified deployment to Maven Central</description>
+
+    <!--项目地址-->
+    <url>https://gitee.com/java-utils_1/sonatype</url>
+    <inceptionYear>2025</inceptionYear>
+
+    <!--组织-->
+    <organization>
+        <name>dripWaterArun</name>
+        <url>https://gitee.com/xudai</url>
+    </organization>
+
+    <!-- 开发者信息，根据实际情况修改 -->
+    <developers>
+        <developer>
+            <!--开发者名-->
+            <name>戴煦</name>
+            <!--邮箱-->
+            <email>daixu_arun@sina.com</email>
+            <!--开发者主页-->
+            <url>https://gitee.com/xudai</url>
+        </developer>
+    </developers>
+
+    <!-- 仓库信息，根据实际情况修改 -->
+    <scm>
+        <!--项目 git 仓库地址-->
+        <url>scm:git:https://gitee.com/java-utils_1/sonatype</url>
+        <!-- connection 与 developerConnection 写一个就可以-->
+        <!--项目 git 克隆地址(只读) RELEASE 版本-->
+        <connection>scm:git:https://gitee.com/java-utils_1/sonatype</connection>
+        <!--项目 git 克隆地址（读写）SNAPSHOT 版本-->
+        <developerConnection>scm:git:git@gitee.com:java-utils_1/sonatype.git</developerConnection>
+        <!--表示当前使用的是代码库的最新版本（主干）-->
+        <tag>HEAD</tag>
+    </scm>
+
+    <!-- 项目设定 -->
+    <properties>
+
+        <!-- *********************************************** 基础配置 START ***********************************************-->
+        <!--指定项目源码 jdk 版本-->
+        <jdk.version>22</jdk.version>
+        <!--版本号-->
+        <versionNum>0.0.7</versionNum>
+        <!--版本类型（默认快照版本）-->
+        <revision>${versionNum}-SNAPSHOT</revision>
+        <!--项目编码-->
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <!-- *********************************************** 基础配置 END ***********************************************-->
+
+        <!-- *********************************************** 版本管理 START ***********************************************-->
+        <!--maven 插件所依赖的插件版本 START-->
+        <lombok.version>1.18.42</lombok.version>
+        <plexus.utils.version>3.4.2</plexus.utils.version>
+        <maven-plugin.version>4.0.0-rc-4</maven-plugin.version>
+        <maven-plugin-plugin.version>3.15.1</maven-plugin-plugin.version>
+        <flatten-maven-plugin.version>1.7.3</flatten-maven-plugin.version>
+        <maven-compiler-plugin.version>3.11.0</maven-compiler-plugin.version>
+        <properties-maven-plugin.version>1.2.1</properties-maven-plugin.version>
+        <maven-plugin-annotations.version>3.15.1</maven-plugin-annotations.version>
+        <!--maven 插件所依赖的插件版本 END-->
+
+        <!--发布到中央仓库所需插件 START-->
+        <!--gpg 加密插件，发布到中央仓库的时候使用-->
+        <maven-gpg-plugin.version>3.2.8</maven-gpg-plugin.version>
+        <!--源码发布插件，发布到中央仓库的时候使用-->
+        <maven-source-plugin.version>3.3.1</maven-source-plugin.version>
+        <!--生成 javadoc 文档插件，发布到中央仓库的时候使用-->
+        <maven-javadoc-plugin.version>3.12.0</maven-javadoc-plugin.version>
+        <!--nexus 发布到中央仓库插件，发布到中央仓库的时候使用-->
+        <central-publishing-maven-plugin.version>0.9.0</central-publishing-maven-plugin.version>
+        <!--发布到中央仓库所需插件 END-->
+        <!-- *********************************************** 版本管理 END ***********************************************-->
+
+        <!-- *********************************************** 项目参数配置 START ***********************************************-->
+        <!--
+            uploaded: 仅等待文件上传完成,快速上传，后续手动处理，只报告上传失败。
+            validated: 等待上传+服务器验证,确保文件格式正确，报告上传和验证失败。
+            published: 等待上传+验证+发布完成，完全自动化发布，报告所有阶段失败。
+        -->
+        <wait-until>validated</wait-until>
+        <!--自动发布 RELEASES 稳定版 到中央仓库中央仓库开关（true 自动发布 false 手动发布）-->
+        <auto-releases-enabled>false</auto-releases-enabled>
+        <!--发布到中央仓库的命名空间 id-->
+        <publishing-server-id>${publishing_server_id}</publishing-server-id>
+        <!-- gpg 公钥-->
+        <gpg-keyname>${gpg.keyname}</gpg-keyname>
+        <!-- gpg 密码-->
+        <gpg-passphrase>${gpg.passphrase}</gpg-passphrase>
+        <!-- *********************************************** 项目参数配置 END ***********************************************-->
+
+    </properties>
+
+    <!-- 许可证信息 Apache 2.0 -->
+    <licenses>
+        <license>
+            <name>The Apache Software License, Version2.0</name>
+            <url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <!--maven jar 包版本管理-->
+    <dependencyManagement>
+
+        <dependencies>
+
+            <!-- https://mvnrepository.com/artifact/org.apache.maven.plugin-tools/maven-plugin-annotations -->
+            <dependency>
+                <groupId>org.apache.maven.plugin-tools</groupId>
+                <artifactId>maven-plugin-annotations</artifactId>
+                <version>${maven-plugin-annotations.version}</version>
+            </dependency>
+
+            <!-- Maven Plugin API -->
+            <dependency>
+                <groupId>org.apache.maven</groupId>
+                <artifactId>maven-plugin-api</artifactId>
+                <version>${maven-plugin.version}</version>
+            </dependency>
+
+            <!-- 用于操作 POM 模型 -->
+            <dependency>
+                <groupId>org.apache.maven</groupId>
+                <artifactId>maven-model</artifactId>
+                <version>${maven-plugin.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.maven</groupId>
+                <artifactId>maven-core</artifactId>
+                <version>${maven-plugin.version}</version>
+                <scope>provided</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>org.codehaus.plexus</groupId>
+                <artifactId>plexus-utils</artifactId>
+                <version>${plexus.utils.version}</version>
+            </dependency>
+
+            <!-- Maven Invoker -->
+            <dependency>
+                <groupId>org.apache.maven.shared</groupId>
+                <artifactId>maven-invoker</artifactId>
+                <version>3.2.0</version>
+            </dependency>
+
+            <!-- lombok -->
+            <dependency>
+                <groupId>org.projectlombok</groupId>
+                <artifactId>lombok</artifactId>
+                <version>${lombok.version}</version>
+            </dependency>
+
+            <!-- 插件自身的依赖 -->
+            <dependency>
+                <groupId>org.codehaus.plexus</groupId>
+                <artifactId>plexus-component-api</artifactId>
+                <version>1.0-alpha-33</version>
+            </dependency>
+
+            <!-- 核心 YAML 解析依赖：SnakeYAML -->
+            <dependency>
+                <groupId>org.yaml</groupId>
+                <artifactId>snakeyaml</artifactId>
+                <version>2.5</version>
+       <!--         <scope>compile</scope>-->
+            </dependency>
+
+            <!-- Spring 核心模块（包含 Resource 相关类） -->
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-core</artifactId>
+                <version>5.3.31</version> <!-- 推荐稳定版：5.x 支持 Java 8+，6.x 支持 Java 17+ -->
+            </dependency>
+
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-annotations</artifactId>
+                <version>2.15.2</version> <!-- 版本号可根据需求调整，建议使用稳定版 -->
+            </dependency>
+
+            <!-- Jackson 数据绑定库（用于 JSON 与对象的转换，依赖注解库） -->
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-databind</artifactId>
+                <version>2.15.2</version> <!-- 版本需与 annotations 保持一致，避免冲突 -->
+            </dependency>
+
+            <dependency>
+                <groupId>com.fasterxml.jackson.dataformat</groupId>
+                <artifactId>jackson-dataformat-yaml</artifactId>
+                <version>2.15.2</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.fasterxml.jackson.datatype</groupId>
+                <artifactId>jackson-datatype-jsr310</artifactId>
+                <version>2.16.1</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-lang3</artifactId>
+                <version>3.14.0</version>
+            </dependency>
+
+            <!-- Bean Validation 规范 API（必选） -->
+            <dependency>
+                <groupId>jakarta.validation</groupId>
+                <artifactId>jakarta.validation-api</artifactId>
+                <version>3.0.2</version> <!-- 适配 Java 11+，若用 Java 8 可选择 2.0.1.Final -->
+            </dependency>
+
+            <!-- Hibernate Validator 实现（必选） -->
+            <dependency>
+                <groupId>org.hibernate.validator</groupId>
+                <artifactId>hibernate-validator</artifactId>
+                <version>8.0.1.Final</version> <!-- 版本需与 API 兼容，Java 8 可选 6.2.5.Final -->
+            </dependency>
+
+            <!-- EL 表达式依赖（若在非容器环境中使用，如 Java SE） -->
+<!--            <dependency>-->
+<!--                <groupId>org.glassfish</groupId>-->
+<!--                <artifactId>jakarta.el</artifactId>-->
+<!--                <version>5.0.0</version>-->
+<!--            </dependency>-->
+
+            <!-- MapStruct 核心库 -->
+            <dependency>
+                <groupId>org.mapstruct</groupId>
+                <artifactId>mapstruct</artifactId>
+                <version>1.5.5.Final</version> <!-- 使用一个稳定版本 -->
+            </dependency>
+
+            <dependency>
+                <groupId>org.mapstruct</groupId>
+                <artifactId>mapstruct-processor</artifactId>
+                <version>1.5.5.Final</version>
+                <scope>provided</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>com.fasterxml.jackson.module</groupId>
+                <artifactId>jackson-module-parameter-names</artifactId>
+                <version>2.15.3</version> <!-- 版本需与 Jackson 核心包一致 -->
+            </dependency>
+
+        </dependencies>
+
+    </dependencyManagement>
+
+    <dependencies>
+
+        <dependency>
+            <groupId>org.apache.maven.plugin-tools</groupId>
+            <artifactId>maven-plugin-annotations</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.maven</groupId>
+            <artifactId>maven-plugin-api</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.maven</groupId>
+            <artifactId>maven-core</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.maven</groupId>
+            <artifactId>maven-model</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.codehaus.plexus</groupId>
+            <artifactId>plexus-utils</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.maven.shared</groupId>
+            <artifactId>maven-invoker</artifactId>
+        </dependency>
+
+        <!-- lombok -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.codehaus.plexus</groupId>
+            <artifactId>plexus-component-api</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.yaml</groupId>
+            <artifactId>snakeyaml</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-core</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-annotations</artifactId>
+        </dependency>
+
+        <!-- Jackson 数据绑定库（用于 JSON 与对象的转换，依赖注解库） -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.fasterxml.jackson.dataformat</groupId>
+            <artifactId>jackson-dataformat-yaml</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.fasterxml.jackson.datatype</groupId>
+            <artifactId>jackson-datatype-jsr310</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+        </dependency>
+
+        <!-- Bean Validation 规范 API（必选） -->
+        <dependency>
+            <groupId>jakarta.validation</groupId>
+            <artifactId>jakarta.validation-api</artifactId>
+        </dependency>
+
+        <!-- Hibernate Validator 实现（必选） -->
+        <dependency>
+            <groupId>org.hibernate.validator</groupId>
+            <artifactId>hibernate-validator</artifactId>
+        </dependency>
+
+        <!-- EL 表达式依赖（若在非容器环境中使用，如 Java SE） -->
+<!--        <dependency>-->
+<!--            <groupId>org.glassfish</groupId>-->
+<!--            <artifactId>jakarta.el</artifactId>-->
+<!--        </dependency>-->
+
+        <!-- MapStruct 核心库 -->
+        <dependency>
+            <groupId>org.mapstruct</groupId>
+            <artifactId>mapstruct</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.mapstruct</groupId>
+            <artifactId>mapstruct-processor</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.fasterxml.jackson.module</groupId>
+            <artifactId>jackson-module-parameter-names</artifactId>
+        </dependency>
+
+    </dependencies>
+
+    <build>
+
+        <!-- pluginManagement 标签用于父 pom 中，子元素可以包含 plugins 插件 -->
+        <pluginManagement>
+
+            <plugins>
+                <!--
+                    Nexus 插件：sonatype 官网提供，部署到 OSSRH Nexus 存储库管理器插件
+                    RELEASES 稳定版发布必须要用的插件，上传jar包到仓库的插件
+                -->
+                <plugin>
+                    <groupId>org.sonatype.central</groupId>
+                    <artifactId>central-publishing-maven-plugin</artifactId>
+                    <version>${central-publishing-maven-plugin.version}</version>
+                    <extensions>true</extensions>
+                    <configuration>
+                        <publishingServerId>${publishing-server-id}</publishingServerId>
+                        <autoPublish>${auto-releases-enabled}</autoPublish>
+                        <waitUntil>${wait-until}</waitUntil>
+                    </configuration>
+                </plugin>
+
+                <!-- gpg 插件（必须）：用于签名认证 -->
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-gpg-plugin</artifactId>
+                    <version>${maven-gpg-plugin.version}</version>
+                    <executions>
+                        <execution>
+                            <id>sign-artifacts</id>
+                            <phase>verify</phase>
+                            <goals>
+                                <goal>sign</goal>
+                            </goals>
+                            <configuration>
+                                <keyname>${gpg-keyname}</keyname>
+                                <passphrase>${gpg-passphrase}</passphrase>
+                            </configuration>
+                        </execution>
+                    </executions>
+                </plugin>
+
+                <!-- source 插件（选用）：生成 source 文件-->
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-source-plugin</artifactId>
+                    <version>${maven-source-plugin.version}</version>
+                    <executions>
+                        <execution>
+                            <id>attach-sources</id>
+                            <goals>
+                                <goal>jar-no-fork</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+
+                <!--Javadoc 插件（选用）：生成 Javadoc 文件-->
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-javadoc-plugin</artifactId>
+                    <version>${maven-javadoc-plugin.version}</version>
+                    <executions>
+                        <execution>
+                            <id>attach-javadocs</id>
+                            <goals>
+                                <goal>jar</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+
+                <!--自定义插件所需的插件-->
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-plugin-plugin</artifactId>
+                    <version>${maven-plugin-plugin.version}</version>
+                </plugin>
+
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>${maven-compiler-plugin.version}</version>
+                </plugin>
+
+                <!--动态版本号-->
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>flatten-maven-plugin</artifactId>
+                    <version>${flatten-maven-plugin.version}</version>
+                    <configuration>
+                        <updatePomFile>true</updatePomFile>
+                        <flattenMode>resolveCiFriendliesOnly</flattenMode>
+                        <outputDirectory>${project.build.directory}</outputDirectory>
+                        <flattenedPomFilename>pom.xml</flattenedPomFilename>
+                    </configuration>
+                    <executions>
+                        <execution>
+                            <id>flatten</id>
+                            <phase>process-resources</phase>
+                            <goals>
+                                <goal>flatten</goal>
+                            </goals>
+                        </execution>
+                        <execution>
+                            <id>flatten-clean</id>
+                            <phase>clean</phase>
+                            <goals>
+                                <goal>clean</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+
+                <!--读取 properties 文件配置-->
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>properties-maven-plugin</artifactId>
+                    <version>${properties-maven-plugin.version}</version>
+                    <executions>
+                        <execution>
+                            <!-- 通常绑定到 initialize 阶段，尽早加载属性 -->
+                            <phase>initialize</phase>
+                            <goals>
+                                <goal>read-project-properties</goal>
+                            </goals>
+                            <configuration>
+                                <files>
+                                    <!-- 指定属性文件路径，相对路径基于项目根目录 -->
+                                    <!--<file>config.properties</file>-->
+                                    <!-- 可以加载多个文件 -->
+                                    <file>${basedir}/src/main/resources/config.properties</file>
+                                </files>
+                            </configuration>
+                        </execution>
+                    </executions>
+                </plugin>
+
+                <plugin>
+                    <groupId>org.codehaus.plexus</groupId>
+                    <artifactId>plexus-component-metadata</artifactId>
+                    <version>1.7.1</version>
+                    <executions>
+                        <execution>
+                            <goals>
+                                <goal>generate-metadata</goal>
+                                <goal>generate-test-metadata</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>3.8.1</version>
+                    <configuration>
+                        <source>1.8</source> <!-- 或更高版本 -->
+                        <target>1.8</target>
+                        <encoding>UTF-8</encoding>
+                        <!-- 配置注解处理器 -->
+                        <annotationProcessorPaths>
+                            <path>
+                                <groupId>org.mapstruct</groupId>
+                                <artifactId>mapstruct-processor</artifactId>
+                                <version>1.5.5.Final</version>
+                            </path>
+                        </annotationProcessorPaths>
+                    </configuration>
+                </plugin>
+
+            </plugins>
+
+        </pluginManagement>
+
+        <plugins>
+
+            <!-- 发布到中央仓库所需插件 -->
+            <plugin>
+                <groupId>org.sonatype.central</groupId>
+                <artifactId>central-publishing-maven-plugin</artifactId>
+            </plugin>
+
+            <!-- gpg 插件（必须）：用于签名认证 -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-gpg-plugin</artifactId>
+            </plugin>
+
+            <!-- source 插件（选用）：生成 source 文件-->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+            </plugin>
+
+            <!--Javadoc 插件（选用）：生成 Javadoc 文件-->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+            </plugin>
+
+            <!--自定义插件所需的插件-->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-plugin-plugin</artifactId>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+            </plugin>
+
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>flatten-maven-plugin</artifactId>
+            </plugin>
+
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>properties-maven-plugin</artifactId>
+            </plugin>
+
+            <plugin>
+                <groupId>org.codehaus.plexus</groupId>
+                <artifactId>plexus-component-metadata</artifactId>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+            </plugin>
+
+        </plugins>
+
+    </build>
+
+    <!-- 根据不同的环境配置发布的版本 -->
+    <profiles>
+
+        <!-- 自动发布开关 -->
+        <profile>
+            <id>auto</id>
+            <properties>
+                <profileActive>auto</profileActive>
+                <!--上传中央仓库自动发布开关 true 自动发布 false 手动发布-->
+                <auto-releases-enabled>true</auto-releases-enabled>
+                <!--published: 等待部署上传、验证和发布全部完成-->
+                <wait-until>published</wait-until>
+            </properties>
+        </profile>
+
+        <!-- 快照版：SNAPSHOT -->
+        <profile>
+            <id>snapshot</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <properties>
+                <profileActive>snapshot</profileActive>
+                <!-- 版本类型：默认快照版以 SNAPSHOT 结尾 -->
+                <revision>${versionNum}-SNAPSHOT</revision>
+            </properties>
+
+        </profile>
+
+        <!-- 稳定版：RELEASE (发布到中央仓库) -->
+        <profile>
+            <id>release</id>
+            <properties>
+                <profileActive>release</profileActive>
+                <!-- 版本类型：稳定版以 RELEASE 结尾 -->
+                <revision>${versionNum}</revision>
+            </properties>
+        </profile>
+
+    </profiles>
+
+</project>
